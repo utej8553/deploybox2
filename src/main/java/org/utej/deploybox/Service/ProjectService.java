@@ -24,22 +24,29 @@ public class ProjectService {
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
     }
-    public Project createProject(String username, String projectName){
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Username not found"));
-        String userFolder = STORAGE_BASE + "/" + user.getUsername();
-        String projectFolder = STORAGE_BASE + "/" + projectName;
-        File folder = new File(projectFolder);
-        if(!folder.exists()&&!folder.mkdirs()){
-            throw new RuntimeException("Failed to create project folder");
-        }
-        Project project = new Project();
-        project.setName(projectName);
-        project.setUser(user);
-        project.setCreated(LocalDateTime.now());
-        project.setUser(user);
-        return projectRepository.save(project);
+    public Project createProject(String username, String projectName) {
+    User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Username not found"));
+
+    File userDir = new File(STORAGE_BASE, user.getUsername());
+    if (!userDir.exists() && !userDir.mkdirs()) {
+        throw new RuntimeException("Failed to create user folder");
     }
+
+    File projectDir = new File(userDir, projectName);
+    if (!projectDir.exists() && !projectDir.mkdirs()) {
+        throw new RuntimeException("Failed to create project folder");
+    }
+
+    Project project = new Project();
+    project.setName(projectName);
+    project.setFolderpath(projectDir.getAbsolutePath()); // <-- set folderpath
+    project.setUser(user);
+    project.setCreated(LocalDateTime.now());
+
+    return projectRepository.save(project);
+}
+
     public void uploadFiles(String username, String projectName, MultipartFile file) throws IOException {
         // Find user and project
         User user = userRepository.findByUsername(username)
@@ -80,3 +87,4 @@ public class ProjectService {
         }
     }
 }
+
