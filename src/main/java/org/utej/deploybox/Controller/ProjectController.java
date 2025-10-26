@@ -12,8 +12,17 @@ public class ProjectController {
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
-    @PostMapping("/create")
-    public Project createProject(@RequestParam String username, @RequestParam String projectName){
-        return projectService.createProject(username,projectName);
+    @PostMapping("/api/projects/create")
+public ResponseEntity<?> createProject(@RequestParam String username,
+                                       @RequestParam String projectName) {
+    try {
+        Project project = projectService.createProject(username, projectName);
+        return ResponseEntity.ok(project);
+    } catch (Exception e) {
+        e.printStackTrace(); // this will show the exact error in the backend logs
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
+}
+
+
 }
