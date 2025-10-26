@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: deploybox-db
+    restart: always
+    environment:
+      POSTGRES_USER: deployuser
+      POSTGRES_PASSWORD: deploypass
+      POSTGRES_DB: deploybox
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - deploy_net
+  app:
+    build: .
+    container_name: deploybox-app
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/deploybox
+      SPRING_DATASOURCE_USERNAME: deployuser
+      SPRING_DATASOURCE_PASSWORD: deploypass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+        - deploy_net
+
+volumes:
+  db_data:
+
+networks:
+  deploy_net:
+    driver: bridge
