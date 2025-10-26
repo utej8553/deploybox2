@@ -30,7 +30,7 @@
       const password = qs('suPassword').value;
       if(!username || !email || !password){ showMessage(signupMsg, 'Please fill all fields', false); return; }
       try{
-        await postFormUrlEncoded('http://localhost:8080/api/users/signup', { username, email, password });
+        await postFormUrlEncoded('/api/users/signup', { username, email, password });
         showMessage(signupMsg, 'Signup successful', true);
       }catch(err){
         const msg = (err && err.body && err.body.message) || (err.body && JSON.stringify(err.body)) || 'Signup failed';
@@ -48,7 +48,7 @@
       const password = qs('liPassword').value;
       if(!username || !password){ showMessage(loginMsg, 'Please enter username and password', false); return; }
       try{
-        await postFormUrlEncoded('http://localhost:8080/api/users/login', { username, password });
+        await postFormUrlEncoded('/api/users/login', { username, password });
         showMessage(loginMsg, 'Login successful', true);
         localStorage.setItem('deploybox_username', username);
         qs('cpUsername').value = username;
@@ -69,7 +69,7 @@
       const projectName = qs('cpProjectName').value.trim();
       if(!username || !projectName){ showMessage(createMsg, 'Please provide username and project name', false); return; }
       try{
-        await postFormUrlEncoded('http://localhost:8080/api/projects/create', { username, projectName });
+        await postFormUrlEncoded('/api/projects/create', { username, projectName });
         showMessage(createMsg, 'Project created successfully', true);
       }catch(err){
         const msg = (err && err.body && err.body.message) || 'Create project failed';
@@ -98,7 +98,7 @@
       for(let i=0;i<fileInput.files.length;i++) form.append('file', fileInput.files[i]);
 
       const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'http://localhost:8080/api/deploy/upload', true);
+      xhr.open('POST', '/api/deploy/upload', true);
       xhr.upload.onprogress = function(evt){
         if(evt.lengthComputable){
           const percent = Math.round((evt.loaded / evt.total) * 100);
@@ -110,7 +110,7 @@
         progressEl.style.display = 'none';
         if(xhr.status >=200 && xhr.status < 300){
           showMessage(uploadMsg, 'Upload successful', true);
-          const link = 'http://localhost:8080/' + encodeURIComponent(username) + '/' + encodeURIComponent(projectName) + '/';
+          const link = '/' + encodeURIComponent(username) + '/' + encodeURIComponent(projectName) + '/';
           projectLink.innerHTML = '<strong>Project URL:</strong> <a href="' + link + '" target="_blank" rel="noopener">' + link + '</a>';
         }else{
           let errText = xhr.responseText || 'Upload failed';
